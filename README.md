@@ -1,28 +1,59 @@
 # Gitodo
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/gitodo`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+Gitodo is a small program that lets you write quick developer notes to yourself.
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'gitodo'
-```
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
+Install with:
 
     $ gem install gitodo
 
 ## Usage
 
-TODO: Write usage instructions here
+    $ gitodo "Don't forget to foo the baz before sending out a code review"
+    Todo added. There are 3 todos on branch `master`
+
+    $ gitodo "Also should baz the ding"
+    Todo added. There are 4 todos on branch `master`
+
+    $ gitodo --list
+    There are 4 todos on branch `master`
+        [1] Fix one of the things
+        [2] Fix the other of the things
+        [3] Don't forget to foo the baz before sending out a code review
+        [4] Also should baz the ding
+
+    $ gitodo --done 1, 3
+    Finishing 2 todos
+        [1] Fix one of the things
+        [3] Don't forget to foo the baz before sending out a code review
+    Is that correct? [y/n]
+    |> y
+    Finished two todos! There are 2 todos remaining on branch `master`
+        [1] Fix the other of the things
+        [2] Also should baz the ding
+
+    $ gitodo --done
+    Which todos have you finished?
+        [1] Fix the other of the things
+        [2] Also should baz the ding
+    |> 2
+    Finishing 1 todo
+        [2] Also should baz the ding
+    Is that correct? [y/n]
+    |> y
+    Finished 1 todo!
+
+    $ gitodo --check
+    Check failed! There is 1 todo on branch `master`!
+        [1] Fix the order of the things
+
+    $ gitodo --done 1 !
+    Finished 1 todo! `master` is clean!
+
+    $ gitodo --check
+    Check passed! `master` is clean!
+
 
 ## Development
 
@@ -32,10 +63,9 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/Noah Callaway/gitodo. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
+Bug reports and pull requests are welcome on GitHub at https://github.com/apsislabs/gitodo. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [Contributor Covenant](http://contributor-covenant.org) code of conduct.
 
 
 ## License
 
 The gem is available as open source under the terms of the [MIT License](http://opensource.org/licenses/MIT).
-
