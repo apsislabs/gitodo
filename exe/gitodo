@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+
+require 'gitodo'
+puts "You're on branch #{Gitodo::GitService.current_branch}"

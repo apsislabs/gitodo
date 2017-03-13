@@ -1,5 +1,4 @@
-require "gitodo/version"
+require 'slayer'
 
-module Gitodo
-  # Your code goes here...
-end
+require 'gitodo/version'
+require 'gitodo/services/git_service'

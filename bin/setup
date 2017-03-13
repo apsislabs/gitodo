@@ -6,3 +6,9 @@ set -vx
 bundle install
 
 bin/install-githooks
+
+# create the sample git keep file
+cd test/sample
+git init
+git add .
+git commit -m "keep file"
