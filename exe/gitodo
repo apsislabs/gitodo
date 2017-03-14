@@ -1,4 +1,34 @@
 #!/usr/bin/env ruby
 
+
+
 require 'gitodo'
-puts "You're on branch #{Gitodo::GitService.current_branch}"
+
+require 'pp'
+
+options = Gitodo::CommandLineOptions.parse(ARGV)
+
+case options.command
+when "add"
+  todo = ARGV.join(" ")
+  form = Gitodo::AddTodoForm.new({ todo: todo })
+  Gitodo::AddTodoCommand.call(add_form: form) do |m|
+    m.pass {|_, result| puts result.message }
+    m.fail {|_, result| puts result.message; exit 1 }
+  end
+when "done"
+  puts "FINISHING ALL TODO ITEMS"
+when "list"
+  puts "LIST ALL TODO ITEMS"
+when "check"
+  puts "CHECK DEM TODOS"
+else
+  puts "I don' tknow what to do..."
+end
+
+pp options
+pp ARGV
+
+
+
+# puts "You're on branch #{Gitodo::GitService.current_branch}"
