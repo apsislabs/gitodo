@@ -42,7 +42,17 @@ when "list"
     end
   end
 when "check"
-  puts "CHECK DEM TODOS"
+  Gitodo::ListTodoCommand.call do |m|
+    m.fail {|_, result| puts result.message; exit 1 }
+    m.pass do |val, result|
+      if (val.todos.any?)
+        puts %Q(Check failed! There #{are_count_todos(val.todos.count)} on `#{val.branch}`)
+        exit 1
+      end
+
+      puts %Q(Check passed! `#{val.branch}` is clean!)
+    end
+  end
 else
   puts "Command not recognized"
   exit 1
