@@ -1,10 +1,6 @@
 #!/usr/bin/env ruby
 
-
-
 require 'gitodo'
-
-require 'pp'
 
 options = Gitodo::CommandLineOptions.parse(ARGV)
 
@@ -12,8 +8,7 @@ def are_count_todos(count)
   (count == 1) ? "is #{count} todo" : "are #{count} todos"
 end
 
-case options.command
-when "add"
+def do_add()
   todo = ARGV.join(" ").strip
   form = Gitodo::AddTodoForm.new({ todo: todo })
   Gitodo::AddTodoCommand.call(add_form: form) do |m|
@@ -22,9 +17,19 @@ when "add"
       puts %Q(Todo added. There #{are_count_todos(val.todo_count)} on branch `#{val.branch}`)
     end
   end
-when "done"
-  puts "finish todo items"
-when "list"
+end
+
+def do_done()
+  form = Gitodo::DoneTodoForm.new({ todo_indexes: ARGV })
+  Gitodo::DoneTodoCommand.call(done_form: form) do |m|
+    m.fail {|_, result| puts result.message; exit 1 }
+    m.pass do |val|
+      puts %Q(Todo added. There #{are_count_todos(val.todo_count)} on branch `#{val.branch}`)
+    end
+  end
+end
+
+def do_list()
   Gitodo::ListTodoCommand.call do |m|
     m.fail {|_, result| puts result.message; exit 1 }
     m.pass do |val, result|
@@ -41,7 +46,9 @@ when "list"
       puts message
     end
   end
-when "check"
+end
+
+def do_check()
   Gitodo::ListTodoCommand.call do |m|
     m.fail {|_, result| puts result.message; exit 1 }
     m.pass do |val, result|
@@ -53,6 +60,17 @@ when "check"
       puts %Q(Check passed! `#{val.branch}` is clean!)
     end
   end
+end
+
+case options.command
+when "add"
+  do_add
+when "done"
+  do_done
+when "list"
+  do_list
+when "check"
+  do_check
 else
   puts "Command not recognized"
   exit 1

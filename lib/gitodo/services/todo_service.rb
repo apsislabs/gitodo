@@ -12,11 +12,20 @@ module Gitodo
       config[branch] ||= []
       config[branch] << todo
 
-      write_gitodo_config(config)
+      write_gitodo_config
     end
 
     def get_todos(branch:)
       return config[branch] || []
+    end
+
+    def complete_todos(branch:, todo_indexes:)
+      todo_indexes.each do |index|
+        config[branch][index] = nil
+      end
+
+      config[branch] = config[branch].reject(&:nil?)
+      write_gitodo_config
     end
 
     private
@@ -35,7 +44,7 @@ module Gitodo
       return yaml
     end
 
-    def write_gitodo_config(config)
+    def write_gitodo_config
       File.open(gitodo_file, 'w') {|f| f.write config.to_yaml }
     end
   end
