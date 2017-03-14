@@ -20,10 +20,19 @@ require 'minitest/reporters'
 
 Minitest::Reporters.use! Minitest::Reporters::SpecReporter.new
 
-def cd_sample
-  Dir.chdir 'test/sample'
+def cd_sample(&block)
+  cd_to "test/sample", &block
+end
+
+def cd_sample_a(&block)
+  cd_to 'test/sample/a', &block
+end
+
+def cd_to(path)
+  previous_path = Dir.pwd
+  Dir.chdir path
 
   yield
 ensure
-  Dir.chdir '../..'
+  Dir.chdir previous_path
 end

@@ -8,27 +8,42 @@ require 'pp'
 
 options = Gitodo::CommandLineOptions.parse(ARGV)
 
+def are_count_todos(count)
+  (count == 1) ? "is #{count} todo" : "are #{count} todos"
+end
+
 case options.command
 when "add"
-  todo = ARGV.join(" ")
+  todo = ARGV.join(" ").strip
   form = Gitodo::AddTodoForm.new({ todo: todo })
   Gitodo::AddTodoCommand.call(add_form: form) do |m|
-    m.pass {|_, result| puts result.message }
     m.fail {|_, result| puts result.message; exit 1 }
+    m.pass do |val|
+      puts %Q(Todo added. There #{are_count_todos(val.todo_count)} on branch `#{val.branch}`)
+    end
   end
 when "done"
-  puts "FINISHING ALL TODO ITEMS"
+  puts "finish todo items"
 when "list"
-  puts "LIST ALL TODO ITEMS"
+  Gitodo::ListTodoCommand.call do |m|
+    m.fail {|_, result| puts result.message; exit 1 }
+    m.pass do |val, result|
+      message = %Q(There #{are_count_todos(val.todos.count)} on branch `#{val.branch}`)
+
+      if (val.todos.any?)
+        message << "\n"
+      end
+
+      val.todos.each_with_index do |todo, index|
+        message << "\n\t[#{index+1}] #{todo}"
+      end
+
+      puts message
+    end
+  end
 when "check"
   puts "CHECK DEM TODOS"
 else
-  puts "I don' tknow what to do..."
+  puts "Command not recognized"
+  exit 1
 end
-
-pp options
-pp ARGV
-
-
-
-# puts "You're on branch #{Gitodo::GitService.current_branch}"

@@ -13,4 +13,16 @@ class Gitodo::GitServiceTest < Minitest::Test
       assert Gitodo::GitService.is_git_repo
     end
   end
+
+  def test_git_repo_root_should_be_root_from_root
+    cd_sample do
+      assert Gitodo::GitService.git_repo_root.end_with? "test/sample"
+    end
+  end
+
+  def test_git_repo_root_should_be_root_from_subdir
+    cd_sample_a do
+      assert Gitodo::GitService.git_repo_root.end_with? "test/sample"
+    end
+  end
 end

@@ -23,7 +23,7 @@ Install with:
         [3] Don't forget to foo the baz before sending out a code review
         [4] Also should baz the ding
 
-    $ gitodo --done 1, 3
+    $ gitodo --done 1 3
     Finishing 2 todos
         [1] Fix one of the things
         [3] Don't forget to foo the baz before sending out a code review

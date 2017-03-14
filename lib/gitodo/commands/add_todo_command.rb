@@ -10,12 +10,9 @@ module Gitodo
       todo_service = TodoService.new
 
       todo_service.add_todo(branch: branch, todo: add_form.todo)
-      todo_length = todo_service.get_todos(branch: branch).count
+      todo_count = todo_service.get_todos(branch: branch).count
 
-      message_singular = %Q(Todo added. There is #{todo_length} todo on branch `#{branch}`)
-      message_plural = %Q(Todo added. There are #{todo_length} todos on branch `#{branch}`)
-      message = todo_length == 1 ? message_singular : message_plural
-      pass! message: message
+      pass! value: OpenStruct.new( todo_count: todo_count, branch: branch)
     end
   end
 end
