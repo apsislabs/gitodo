@@ -13,25 +13,12 @@ module Gitodo
         fail! message: %Q(There were no todos to finish.)
       end
 
-      todo_indexes = done_form.todo_indexes.map do |index|
-        begin
-          todo_index = Integer(index, 10)
+      todo_indexes = done_form.todo_indexes.uniq
 
-          if todo_index < 1 || todo_index > todos.count
-            fail! message: %Q(The todo index "#{index}" was not in the range 1-#{todos.count}.)
-          end
+      validated = todo_service.validate_todo_indexes(branch: branch, todo_indexes: todo_indexes)
+      fail! message: "One of the todo indexes was not valid." unless validated
 
-          # Shift from userindex [1..todos.count] to
-          # sane-programmer land [0..todos.count-1]
-          todo_index - 1
-        rescue
-          fail! message: %Q(The todo index "#{index}" was not a valid integer.)
-        end
-      end
-
-      todo_indexes = todo_indexes.uniq
       todo_service.complete_todos(branch: branch, todo_indexes: todo_indexes)
-
       todo_count = todo_service.get_todos(branch: branch).count
 
       pass! value: OpenStruct.new(completed_count: todo_indexes.count, todo_count: todo_count, branch: branch)

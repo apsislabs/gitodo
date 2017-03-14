@@ -15,17 +15,39 @@ module Gitodo
       write_gitodo_config
     end
 
-    def get_todos(branch:)
-      return config[branch] || []
+    def get_todos(branch:, todo_indexes: nil)
+      raw_todos = config[branch] || []
+      todos = raw_todos.map.with_index {|todo, i| Todo.new(display_index: i+1, internal_index: i, todo: todo) }
+
+      todos = todos.reject{|t| !todo_indexes.include?(t.display_index) } if todo_indexes
+
+      todos
     end
 
     def complete_todos(branch:, todo_indexes:)
-      todo_indexes.each do |index|
-        config[branch][index] = nil
+      todos = get_todos(branch: branch)
+      todo_indexes = todo_indexes.uniq
+
+      to_complete = todos.reject{|t| !todo_indexes.include?(t.display_index) }
+
+      to_complete.each do |todo|
+        # index-1 to map from crazy user land indexes to real, sane indexes
+        config[branch][todo.internal_index] = nil
       end
 
       config[branch] = config[branch].reject(&:nil?)
       write_gitodo_config
+    end
+
+    def validate_todo_indexes(branch:, todo_indexes:)
+      valid_todo_indexes = get_todos(branch: branch).map{|t| t.display_index}
+
+      todo_indexes = todo_indexes.uniq
+      todo_indexes = todo_indexes.each do |index|
+        return false unless valid_todo_indexes.include? index
+      end
+
+      return true
     end
 
     private

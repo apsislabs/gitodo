@@ -5,7 +5,11 @@ require 'gitodo'
 options = Gitodo::CommandLineOptions.parse(ARGV)
 
 def are_count_todos(count)
-  (count == 1) ? "is #{count} todo" : "are #{count} todos"
+  (count == 1) ? "is #{count_todos(count)}" : "are #{count_todos(count)}"
+end
+
+def count_todos(count)
+  (count == 1) ? "#{count} todo" : "#{count} todos"
 end
 
 def do_add()
@@ -20,7 +24,65 @@ def do_add()
 end
 
 def do_done()
-  form = Gitodo::DoneTodoForm.new({ todo_indexes: ARGV })
+  @todo_indexes = ARGV
+  @needs_confirmation = true
+  @confirmed = false
+
+  # Handle No Arguments
+  if @todo_indexes.empty?
+    # print confirmation
+    Gitodo::ListTodoCommand.call do |m|
+      m.fail {|_, result| puts result.message; exit 1 }
+      m.pass do |val, result|
+        message = %Q(Which todos have you finished?)
+
+        val.todos.each do |todo|
+          message << "\n\t[#{todo.display_index}] #{todo.todo}"
+        end
+
+        puts message
+        print "> "
+
+        @todo_indexes = STDIN.gets.strip.split(" ")
+      end
+    end
+  end
+
+  # if '!' chomp it and skip confirmation
+  if ARGV.include? '!'
+    ARGV.delete '!'
+    @needs_confirmation = false
+  end
+
+  # handle the confirmation
+  if @needs_confirmation
+
+    form = Gitodo::ListTodoForm.new(todo_indexes: @todo_indexes)
+    Gitodo::ListTodoCommand.call(list_form: form) do |m|
+      m.fail {|_, result| puts result.message; exit 1 }
+      m.pass do |val, result|
+        message = "Finishing #{count_todos(val.todos.count)}."
+
+        val.todos.each do |todo|
+          message << "\n\t[#{todo.display_index}] #{todo.todo}"
+        end
+
+        message << "\nIs that correct? [y/n]"
+
+        puts message
+        print "> "
+
+        response = STDIN.gets.strip
+
+        unless response.downcase == "y"
+          puts "Not finishing any todos."
+          exit 1
+        end
+      end
+    end
+  end
+
+  form = Gitodo::DoneTodoForm.new({ todo_indexes: @todo_indexes })
   Gitodo::DoneTodoCommand.call(done_form: form) do |m|
     m.fail {|_, result| puts result.message; exit 1 }
     m.pass do |val|
@@ -35,12 +97,8 @@ def do_list()
     m.pass do |val, result|
       message = %Q(There #{are_count_todos(val.todos.count)} on branch `#{val.branch}`)
 
-      if (val.todos.any?)
-        message << "\n"
-      end
-
-      val.todos.each_with_index do |todo, index|
-        message << "\n\t[#{index+1}] #{todo}"
+      val.todos.each do |todo|
+        message << "\n\t[#{todo.display_index}] #{todo.todo}"
       end
 
       puts message
