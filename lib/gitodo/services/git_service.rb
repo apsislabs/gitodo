@@ -1,8 +1,12 @@
 module Gitodo
-  class GitService
+  class GitService < Slayer::Service
+
+    def self.is_git_repo
+      `git rev-parse --is-inside-work-tree`.strip == "true"
+    end
 
     def self.current_branch
-      `git branch | grep \\* | cut -d ' ' -f2`.strip
+      branch = `git branch | grep \\* | cut -d ' ' -f2`.strip
     end
   end
 end

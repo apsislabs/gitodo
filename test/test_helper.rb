@@ -24,6 +24,6 @@ def cd_sample
   Dir.chdir 'test/sample'
 
   yield
-
+ensure
   Dir.chdir '../..'
 end
