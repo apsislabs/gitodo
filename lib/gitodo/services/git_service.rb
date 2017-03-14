@@ -8,5 +8,9 @@ module Gitodo
     def self.current_branch
       branch = `git branch | grep \\* | cut -d ' ' -f2`.strip
     end
+
+    def self.git_repo_root
+      `git rev-parse --show-toplevel`.strip
+    end
   end
 end
